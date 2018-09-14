@@ -13,7 +13,7 @@ This module will walk you through building and testing your first Azure Function
       * If using Visual Studio for in Windows, make sure you have the <a href="https://www.visualstudio.com/vs/" target="_blank">latest Visual Studio 2017</a> with the `Azure development workload` selected.  
 * [Azure Functions Core Tools]()
 * [.NET Core 2.1 SDK](https://www.microsoft.com/net/download)
-* (Optional if writing in JavaScript) [NodeJS 8 (LTS) or 10 (Current)](https://nodejs.org/en/download/)
+* [NodeJS 8 (LTS) or 10 (Current)](https://nodejs.org/en/download/)
 
 ## Challenge
 
@@ -45,6 +45,80 @@ You or your team must be able to show this function running locally and publishe
 1. Create a new Azure Function project and select the HTTP template.
     * The HTTP function template will return "Hello, {name}", where name is a property passed in to a query parameter or as the body.
     * Make changes to the HTTP template so instead of returning "Hello, {name}" it returns the above `json` payload when a query parameter `id` is set to `1`.
+1. Check out the [documentation](#documentation) for more guidance
+
+### Guided instructions
+
+1. Open Visual Studio Code
+1. Click on the extensions category on the left-hand nav and verify or install the **Azure Functions** extension (this may require restarting code)
+1. Click on the **Azure** category on the left-hand nav
+1. Open the **Functions** extension and verify you are signed into an Azure account
+1. Click the folder icon to create a new project - it will prompt you to select a folder to create the app in
+1. Choose "beta" or "~2" for the runtime if you are prompted, and select "JavaScript" for the language
+1. Click the lightning bolt icon in the Azure Functions extension to add a function to this app.  Select **HTTP Trigger** for the trigger.  Give it any name you like (I'll just leave as the default "HttpTriggerJS")
+1. Select **Anonymous** for the authentication type.  **Function** would also work but requires a key is passed in a header or query parameter to execute the function once published.
+1. You should now see a default Azure Functions teamplate like the following:
+
+    ```javascript
+    module.exports = async function (context, req) {
+        context.log('JavaScript HTTP trigger function processed a request.');
+    
+        if (req.query.name || (req.body && req.body.name)) {
+            context.res = {
+                // status: 200, /* Defaults to 200 */
+                body: "Hello " + (req.query.name || req.body.name)
+            };
+        }
+        else {
+            context.res = {
+                status: 400,
+                body: "Please pass a name on the query string or in the request body"
+            };
+        }
+    };
+    ```
+
+    >IMPORTANT: If you don't see this template you may be targeting the ~1 runtime (wouldn't have the `async` modifier on the method) or using an out of date version of function core tools / extension
+
+1. Make the following changes so that your function returns the suggested string:
+
+    ```javascript
+    module.exports = async function (context, req) {
+        context.log('JavaScript HTTP trigger function processed a request.');
+    
+        context.res = {
+            status: 200,
+            body: {
+                id: "1",
+                flavor: "Rainbow Road",
+                "price-per-scoop": 3.99
+            }
+        }
+    };
+    ```
+
+    You may also notice in the file browser next to your `index.js` file there is a `function.json` file. Go ahead and open this and look. It describes the trigger you are using, and any bindings.  It should be set for HTTPTrigger.
+
+1. Click **Debug** at the top and **Start Debugging**
+
+    You should notice the Azure Functions runtime spins up in the terminal window.  If all the code is valid you should be prompted with a URL to call to execute the function.  Something like `http://localhost:7071/api/HttpTriggerJS`
+
+1. While the runtime is still running, click on the link or copy it to a browser to execute the function.  You should see a response like the following returned:
+
+    ```json
+    {
+        "id": "1",
+        "flavor": "Rainbow Road",
+        "price-per-scoop": 3.99
+    }
+    ```
+
+1. The final step is publishing this app to Azure.  Kill the terminal (click the trash icon) to stop the runtime, and open the Azure Functions extension.
+1. Click the up-arrow icon in the Functions extension to publish, and select this app in the list.  Choose to **Create New Function App** and give it a *globally* unique name.  Create a new resource group and give it a name, and create a new storage account and give it a name.  Choose any region to publish.
+    
+1. You should see a prompt in the bottom right that the app is publishing.  Once the app is published you should be able to open your subscription and see the function.  You should be able to open the app and this HTTP function you have just created.  Click the **Get function URL** link in the function to get a URL, and validate you can invoke it and it executes in the cloud.
+
+Congratulations! You've now published an Azure Function as an API in the cloud.
 
 ### Documentation
 

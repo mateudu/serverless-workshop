@@ -11,7 +11,7 @@ This module will walk you through building and testing your first Azure Function
     > NOTE: While you can complete this entire workshop in any language and editor you prefer, to make applicable to as many operating systems as possible most of the samples and examples will assume VS Code + JavaScript.  
       * If using Visual Studio Code in Windows, OSX, or Linux make sure you have the latest Visual Studio Code version for your OS. You can follow <a href="https://code.visualstudio.com/tutorials/functions-extension/getting-started" target="_blank">the **first page** of pre-requisites as described here</a> to get the Azure Functions extension configured  
       * If using Visual Studio for in Windows, make sure you have the <a href="https://www.visualstudio.com/vs/" target="_blank">latest Visual Studio 2017</a> with the `Azure development workload` selected.  
-* [Azure Functions Core Tools]()  
+* [Azure Functions Core Tools v2](https://github.com/Azure/azure-functions-core-tools#installing)  
 * [.NET Core 2.1 SDK](https://www.microsoft.com/net/download)
 * [NodeJS 8 (LTS) or 10 (Current)](https://nodejs.org/en/download/)
 
@@ -20,7 +20,7 @@ This module will walk you through building and testing your first Azure Function
 Run and test an Azure Function locally where you can do a `GET` on a specific endpoint and pass in a product ID.  The product ID will return information on the product flavor.  For example if you did the following HTTP Request:
 
 ```
-GET http://{myFunctionEndpoint}/api/product?id=1
+GET http://{myFunctionEndpoint}/api/products?id=1
 ```
 
 It would return:
@@ -55,9 +55,9 @@ You or your team must be able to show this function running locally and publishe
 1. Open the **Functions** extension and verify you are signed into an Azure account
 1. Click the folder icon to create a new project - it will prompt you to select a folder to create the app in
 1. Choose "beta" or "~2" for the runtime if you are prompted, and select "JavaScript" for the language
-1. Click the lightning bolt icon in the Azure Functions extension to add a function to this app.  Select **HTTP Trigger** for the trigger.  Give it any name you like (I'll just leave as the default "HttpTriggerJS")
+1. Click the lightning bolt icon in the Azure Functions extension to add a function to this app.  Select **HTTP Trigger** for the trigger.  Give it any name you like (I'll name "products")
 1. Select **Anonymous** for the authentication type.  **Function** would also work but requires a key is passed in a header or query parameter to execute the function once published.
-1. You should now see a default Azure Functions teamplate like the following:
+1. You should now see a default Azure Functions template like the following:
 
     ```javascript
     module.exports = async function (context, req) {
@@ -101,7 +101,7 @@ You or your team must be able to show this function running locally and publishe
         else {
             context.res = {
                 status: 400,
-                body: "Please pass in an id query paramter"
+                body: "Please pass in an id query parameter"
             }
         }
     };
@@ -111,9 +111,9 @@ You or your team must be able to show this function running locally and publishe
 
 1. Click **Debug** at the top and **Start Debugging**
 
-    You should notice the Azure Functions runtime spins up in the terminal window.  If all the code is valid you should be prompted with a URL to call to execute the function.  Something like `http://localhost:7071/api/HttpTriggerJS`
+    You should notice the Azure Functions runtime spins up in the terminal window.  If all the code is valid you should be prompted with a URL to call to execute the function.  Something like `http://localhost:7071/api/products`
 
-1. While the runtime is still running, click on the link or copy it to a browser to execute the function.  Make sure you append a query parameter for ID as specified.  So the call should be like `http://localhost:7071/api/HttpTriggerJS?id=1`.  You should see a response like the following returned:
+1. While the runtime is still running, click on the link or copy it to a browser to execute the function.  Make sure you append a query parameter for ID as specified.  So the call should be like `http://localhost:7071/api/products?id=1`.  You should see a response like the following returned:
 
     ```json
     {

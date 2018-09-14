@@ -86,12 +86,22 @@ You or your team must be able to show this function running locally and publishe
     module.exports = async function (context, req) {
         context.log('JavaScript HTTP trigger function processed a request.');
     
-        context.res = {
-            status: 200,
-            body: {
-                id: "1",
-                flavor: "Rainbow Road",
-                "price-per-scoop": 3.99
+        if (req.query.id) {
+            if (req.query.id == "1") {
+                context.res = {
+                    status: 200,
+                    body: {
+                        id: "1",
+                        flavor: "Rainbow Road",
+                        "price-per-scoop": 3.99
+                    }
+                }
+            }
+        }
+        else {
+            context.res = {
+                status: 400,
+                body: "Please pass in an id query paramter"
             }
         }
     };
@@ -103,7 +113,7 @@ You or your team must be able to show this function running locally and publishe
 
     You should notice the Azure Functions runtime spins up in the terminal window.  If all the code is valid you should be prompted with a URL to call to execute the function.  Something like `http://localhost:7071/api/HttpTriggerJS`
 
-1. While the runtime is still running, click on the link or copy it to a browser to execute the function.  You should see a response like the following returned:
+1. While the runtime is still running, click on the link or copy it to a browser to execute the function.  Make sure you append a query parameter for ID as specified.  So the call should be like `http://localhost:7071/api/HttpTriggerJS?id=1`.  You should see a response like the following returned:
 
     ```json
     {
@@ -116,7 +126,7 @@ You or your team must be able to show this function running locally and publishe
 1. The final step is publishing this app to Azure.  Kill the terminal (click the trash icon) to stop the runtime, and open the Azure Functions extension.
 1. Click the up-arrow icon in the Functions extension to publish, and select this app in the list.  Choose to **Create New Function App** and give it a *globally* unique name.  Create a new resource group and give it a name, and create a new storage account and give it a name.  Choose any region to publish.
     
-1. You should see a prompt in the bottom right that the app is publishing.  Once the app is published you should be able to open your subscription and see the function.  You should be able to open the app and this HTTP function you have just created.  Click the **Get function URL** link in the function to get a URL, and validate you can invoke it and it executes in the cloud.
+1. You should see a prompt in the bottom right that the app is publishing.  Once the app is published you should be able to open your subscription and see the function.  You should be able to open the app and this HTTP function you have just created.  Click the **Get function URL** link in the function to get a URL, and validate you can invoke it and it executes in the cloud. (Be sure to append the query parameter)
 
 Congratulations! You've now published an Azure Function as an API in the cloud.
 

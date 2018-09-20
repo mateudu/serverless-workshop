@@ -49,6 +49,8 @@ You or your team must be able to show this function running locally and publishe
 
 ### Guided instructions
 
+<details><summary>Click to open</summary><p>
+
 1. Open Visual Studio Code
 1. Click on the extensions category on the left-hand nav and verify or install the **Azure Functions** extension (this may require restarting code)
 1. Click on the **Azure** category on the left-hand nav
@@ -129,6 +131,8 @@ You or your team must be able to show this function running locally and publishe
 1. You should see a prompt in the bottom right that the app is publishing.  Once the app is published you should be able to open your subscription and see the function.  You should be able to open the app and this HTTP function you have just created.  Click the **Get function URL** link in the function to get a URL, and validate you can invoke it and it executes in the cloud. (Be sure to append the query parameter)
 
 Congratulations! You've now published an Azure Function as an API in the cloud.
+
+</p></details>
 
 ### Documentation
 

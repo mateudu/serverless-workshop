@@ -54,6 +54,8 @@ Which would add a new document to CosmosDB with the corresponding product inform
 
 ### Guided instructions
 
+<details><summary>Click to open</summary><p>
+
 1. Open the Azure Portal and create a new Azure CosmosDB database.  **BE SURE TO SELECT SQL FOR THE API and Don't enable Virtual Networks**.
     * It's not required but I recommend putting this in the same resource group as the function app from module 1.
 1. After the CosmosDB account has been created, open it and copy the "Primary Connection String" from the **Keys** section.  Save this for later.  You may even want to continue on with the next step and come back later to get the key as CosmosDB can take a few minutes to deploy.
@@ -268,6 +270,7 @@ Which would add a new document to CosmosDB with the corresponding product inform
 
 1. Open your function in the Azure Portal, get the URLs, and verify the functions work in your published apps
 
+</p></details>
 
 ### Documentation
 

@@ -134,7 +134,7 @@ Congratulations! You've now published an Azure Function as an API in the cloud.
 
 </p></details>
 
-### Documentation
+## Documentation
 
 * <a href="https://docs.microsoft.com/en-us/azure/azure-functions/functions-overview" target="_blank">An introduction to Azure Functions</a>
 * <a href="https://docs.microsoft.com/en-us/azure/azure-functions/functions-test-a-function" target="_blank">Strategies for testing your code in Azure Functions</a>

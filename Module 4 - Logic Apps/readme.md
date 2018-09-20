@@ -29,13 +29,7 @@ Capture user's respond and store it in another table in Cosmos DB.
 
 1. First things first, make sure you get the tools installed listed above.  
 
-### Documentation
-
-* [Quickstart: Create your first automated workflow with Azure Logic Apps - Azure portal](https://docs.microsoft.com/azure/logic-apps/quickstart-create-first-logic-app-workflow)
-* [Manage mailing list requests with a logic app](https://docs.microsoft.com/azure/logic-apps/tutorial-process-mailing-list-subscriptions-workflow)
-* [Get started with the delay and delay-until actions](https://docs.microsoft.com/azure/connectors/connectors-native-delay)
-
-## Guided instructions
+### Guided instructions
 <!-- markdownlint-disable MD032 MD033 -->
 <details><summary>Click to open</summary><p>
   
@@ -78,3 +72,9 @@ It's up to you what action to take when there's an unhappy customer! Send them a
  
 </p></details>
 <!-- markdownlint-disable MD032 MD033 -->
+
+## Documentation
+
+* [Quickstart: Create your first automated workflow with Azure Logic Apps - Azure portal](https://docs.microsoft.com/azure/logic-apps/quickstart-create-first-logic-app-workflow)
+* [Manage mailing list requests with a logic app](https://docs.microsoft.com/azure/logic-apps/tutorial-process-mailing-list-subscriptions-workflow)
+* [Get started with the delay and delay-until actions](https://docs.microsoft.com/azure/connectors/connectors-native-delay)

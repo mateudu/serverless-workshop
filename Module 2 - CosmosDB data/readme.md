@@ -272,7 +272,7 @@ Which would add a new document to CosmosDB with the corresponding product inform
 
 </p></details>
 
-### Documentation
+## Documentation
 
 * [Azure Cosmos DB Overview](https://docs.microsoft.com/en-us/azure/cosmos-db/introduction)
 * [Azure Functions CosmosDB Binding (v2)](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-cosmosdb-v2)

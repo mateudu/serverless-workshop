@@ -166,7 +166,7 @@ Which would add a new document to CosmosDB with the corresponding product inform
           "databaseName": "icecream",
           "collectionName": "products",
           "createIfNotExists": true,
-          "connectionStringSetting": "CosmosDbConnectionString",     
+          "connectionStringSetting": "CosmosDbConnectionString",
           "direction": "out"
       }
       ]

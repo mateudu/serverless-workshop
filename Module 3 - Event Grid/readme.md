@@ -214,7 +214,7 @@ POST http://{myFunctionEndpoint}/api/iceCreamOrder
 
   * You will see a Subscription Validation Event appear in your viewer - this is part of [Event Grid's security model](https://docs.microsoft.com/en-us/azure/event-grid/security-authentication), however in this case the viewer handles things for you, so nothing further is required by you.
 
-  ![Create event subscription](./media/create-test-subscription.png)
+  ![Create event subscription](./media/create-test-subscription.PNG)
 
 1. Click the **Debug** menu and **Start Debugging**.
 

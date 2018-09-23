@@ -42,8 +42,14 @@ Upon receiving the event, the Logic App will query Cosmos DB to retrieve the pro
 1. Select `Event Grid` from the list then select `When a resource event occurs` trigger
 ![Event Grid trigger](./images/event-grid-trigger.jpg)
 1. Sign in with the same account you used to sign into Azure portal
-1. Fill in **Subscription**, select `Microsoft.EventGrid.Topics` for **Resource Type**, and select the name you of your custom topic created in **module 3**.
-1. Next, add a `Parse JSON` action by clicking **New step** and search for it.
+1. Fill in **Subscription**, select `Microsoft.EventGrid.Topics` for **Resource Type**, and select the name you of your custom topic created in **module 3**. You may ignore "Event Type Item" selection for this execrise.
+1. Before proceed any further, let's make sure the trigger works. Save the Logic App, and invoke the purchse function you created in Module 3.
+```
+POST http://{myFunctionEndpoint}/api/iceCreamOrder
+```
+1. Close the designer and refresh the Logic App to load new runs, you should see one or more (depending on how many calls you made to the purchase function) funs.
+![Refresh Logic Apps](./images/refresh.jpg)
+1. Once confirmed, switch back to designer by clicking the **Edit** button, and add a `Parse JSON` action by clicking **New step** and search for it.
 1. Use `Data object` as the input to  **Content**.
 1. The easiest way to create the schema is to generate it using a sample, simply click on **Use sample payload to generate schema**, and provide the sample from **module 3**, as shown below.
 ```json

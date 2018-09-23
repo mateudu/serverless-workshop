@@ -1,67 +1,12 @@
 # Module 3 - Making BFYOC event driven
 
-BFYOC ice cream is always updating their ice cream offerings and you need to keep your franchise's ice cream availability constantly up to date. Each time BFYOC adds a new flavor, you'll need to update your CosmodDB from module two with the new offering. BFYOC now has a staff writer and a photographer, so each ice cream will be made available to you with the product data, description, and photo as separate files.
-
-BFYOC is also making its marketing efforts event driven. You will also be creating a system that will publish your own custom event every time an order is placed which you will use later on.
+BFYOC is also making its marketing efforts event driven. You will also be creating a system that will publish your own custom event every time an order is placed. You'll be able to use this system in the next module to trigger downstream apps and workflows.
 
 This module will walk you though subscribing to Azure events as well as publishing custom events in order to build event based reactive programs using Azure Event Grid.
 
-## Pre-requisites
-
-* You must have your app backed by CosmosDB from module two. If you are stuck there or want to jump ahead, you can always use the answers folder in the previous modules.
-
 ## Challenge
 
-There are two parts to this module. The can be done in any order - part one will make you familiar with Azure native events and more advanced functions scenarios; part two will make you familiar with Event Grid Topics and custom events. Module four will build on what we create in part two.
-
-### Part One
-
-So far, you should have implemented a simple API to add products to CosmosDB using just a POST, however now that we have a staff writer and photographer, we don't want to add a product until the data, photo, and description are all available.
-
-Create a storage account of kind `storagev2 (general purpose v2)` or `blob` where your staff writer, photographer, and inventory manager will upload the files to blob storage. Once *all three* files are uploaded for a given ice cream, add a new document to CosmosDB with the aggregated information from all three files:
-
-```json
-{
-    "id": "081517EG",
-    "flavor": "Wonder Blast",
-    "price-per-scoop": 0.60,
-    "photo-url": "https://example.blob.core.windows.net/examplecontainer/081517EG-photo.png",
-    "description": " Topping biscuit cookie chocolate bar lemon drops oat cake gummies jelly. Chocolate cake donut chocolate cupcake. Wafer gingerbread croissant liquorice tootsie roll. Cake lemon drops jujubes jujubes chocolate jelly beans marzipan fruitcake oat cake. Sweet roll tiramisu topping. Cheesecake tootsie roll icing fruitcake sesame snaps bonbon jelly-o biscuit."
-}
-```
-
-To correlate the files, each will be prefixed with the product ID.
-
-* Product data: JSON containing the product ID, flavor, and price as in the previous modules `081517EG-data.json`
-* Product description: Text file containing a few sentences describing the flavor `081517EG-description.txt`
-* Product photo: Photo of the product `081517EG-photo.png`
-
-Two sets of sample files have been provided for you in the supporting-files folder of this module.
-
-### Tips
-
-1. Using Event Grid will allow you to subscribe to `Microsoft.Storage.BlobCreated` events and have then pushed anywhere in real time including (*foreshadowing*) a Durable function. [Here is a quickstart](https://docs.microsoft.com/en-us/azure/event-grid/blob-event-quickstart-portal).
-1. You can deploy a pre-built web app by clicking the button below to send your events to and see them flowing in real time. Super handy for testing.
-
-    <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure-Samples%2Fazure-event-grid-viewer%2Fmaster%2Fazuredeploy.json" target="_blank"><img src="http://azuredeploy.net/deploybutton.png"/></a>
-
-    * Connect Event Subscriptions to the website by setting the Subscription's Endpoint to `https://<your-site-name>.azurewebsites.net/api/updates`.
-    * View your website by navigating to `https://<your-site-name>.azurewebsites.net`.
-
-    ![View new site](./media/grid-viewer.png)
-1. Use [Durable Functions](https://docs.microsoft.com/en-us/azure/azure-functions/durable-functions-overview) to create stateful functions in a serverless environment. This will help you solve the problem of waiting for all three files to be available before creating your new document in CosmosDB.
-
-### Guided instructions
-
-<details><summary>Click to open</summary><p>
-
-TODO
- 
-</p></details>
-
-### Part Two
-
-Our system is now consuming events via Event Grid, but we also want to be able to publish them to trigger other processes every time an order is placed. Create an Azure Function that [publishes an event to a custom topic](https://docs.microsoft.com/en-us/azure/event-grid/post-to-custom-topic) with data about the order every time it is triggered.
+Create an Azure Function that [publishes an event to a custom topic](https://docs.microsoft.com/en-us/azure/event-grid/post-to-custom-topic) with data about the Ice Cream order every time it is triggered.
 
 The event posted to the custom topic must be of the form:
 
@@ -258,6 +203,60 @@ POST http://{myFunctionEndpoint}/api/iceCreamOrder
 1. Open your function in the Azure Portal, get the URLs, and verify the functions work in your published apps
 
 </p></details>
+
+## Bonus
+
+BFYOC ice cream is always updating their ice cream offerings and you need to keep your franchise's ice cream availability constantly up to date. Each time BFYOC adds a new flavor, you'll need to update your CosmodDB from module two with the new offering. BFYOC now has a staff writer and a photographer, so each ice cream will be made available to you with the product data, description, and photo as separate files.
+
+### Pre-requisites
+
+* You must have your app backed by CosmosDB from module two. If you are stuck there or want to jump ahead, you can always use the answers folder in the previous modules.
+
+### Bonus Challenge
+
+So far, you should have implemented a simple API to add products to CosmosDB using just a POST, however now that we have a staff writer and photographer, we don't want to add a product until the data, photo, and description are all available.
+
+Create a storage account of kind `storagev2 (general purpose v2)` or `blob` where your staff writer, photographer, and inventory manager will upload the files to blob storage. Once *all three* files are uploaded for a given ice cream, add a new document to CosmosDB with the aggregated information from all three files:
+
+```json
+{
+    "id": "081517EG",
+    "flavor": "Wonder Blast",
+    "price-per-scoop": 0.60,
+    "photo-url": "https://example.blob.core.windows.net/examplecontainer/081517EG-photo.png",
+    "description": " Topping biscuit cookie chocolate bar lemon drops oat cake gummies jelly. Chocolate cake donut chocolate cupcake. Wafer gingerbread croissant liquorice tootsie roll. Cake lemon drops jujubes jujubes chocolate jelly beans marzipan fruitcake oat cake. Sweet roll tiramisu topping. Cheesecake tootsie roll icing fruitcake sesame snaps bonbon jelly-o biscuit."
+}
+```
+
+To correlate the files, each will be prefixed with the product ID.
+
+* Product data: JSON containing the product ID, flavor, and price as in the previous modules `081517EG-data.json`
+* Product description: Text file containing a few sentences describing the flavor `081517EG-description.txt`
+* Product photo: Photo of the product `081517EG-photo.png`
+
+Two sets of sample files have been provided for you in the supporting-files folder of this module.
+
+### Tips
+
+1. Using Event Grid will allow you to subscribe to `Microsoft.Storage.BlobCreated` events and have then pushed anywhere in real time. [Here is a quickstart](https://docs.microsoft.com/en-us/azure/event-grid/blob-event-quickstart-portal).
+1. You can deploy a pre-built web app by clicking the button below to send your events to and see them flowing in real time. Super handy for testing.
+
+    <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure-Samples%2Fazure-event-grid-viewer%2Fmaster%2Fazuredeploy.json" target="_blank"><img src="http://azuredeploy.net/deploybutton.png"/></a>
+
+    * Connect Event Subscriptions to the website by setting the Subscription's Endpoint to `https://<your-site-name>.azurewebsites.net/api/updates`.
+    * View your website by navigating to `https://<your-site-name>.azurewebsites.net`.
+
+    ![View new site](./media/grid-viewer.png)
+1. You can choose to use [Durable Functions](https://docs.microsoft.com/en-us/azure/azure-functions/durable-functions-overview) to create stateful functions in a serverless environment. This is one way of solving the problem of waiting for all three files to be available before creating your new document in CosmosDB.
+
+1. Like all of the modules in this workshop, there are many ways of accomplishing this objective:
+
+ * Durable functions with a suborchestrator intrance for each batch that waits for all three files.
+ * Using a regular function and with each new file upload, check if all three of the batch are present.
+ * Using the Logic Apps batch trigger.
+ * Loading all files into Cosmos and then a second process that check for all three files of a given batch on some regular interval.
+ * Many more...
+
 
 ## Documentation
 

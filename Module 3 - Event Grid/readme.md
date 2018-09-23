@@ -1,6 +1,6 @@
 # Module 3 - Making BFYOC event driven
 
-BFYOC is also making its marketing efforts event driven. You will also be creating a system that will publish your own custom event every time an order is placed. You'll be able to use this system in the next module to trigger downstream apps and workflows.
+BFYOC is also making its marketing efforts event driven. You will be creating a system that will publish your own custom event every time an order is placed. You'll be able to use this system in the next module to trigger downstream apps and workflows.
 
 This module will walk you though subscribing to Azure events as well as publishing custom events in order to build event based reactive programs using Azure Event Grid.
 

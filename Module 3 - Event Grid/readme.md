@@ -63,90 +63,74 @@ POST http://{myFunctionEndpoint}/api/iceCreamOrder
 
   We need a new function that will handle incoming orders and create an event every time an order is made. Let's go ahead and create that.
 
-1. In the Visual Studio Code extension for Azure Functions, click the lightning bolt icon to add a new function to this app.
-1. Select the current folder and add to the existing app. This function will also be HTTP triggered.
-1. Name it `iceCreamOrder` and give it `anonymous` access permissions.
-1. Replace the code in the new `index.js` for `iceCreamOrder` with the following:
+1. In the Visual Studio create a new HTTP-triggered Azure Function, with `Anonymous` authentication. It can be called `iceCreamOrder`.
+1. Install `Microsoft.Azure.EventGrid` package.
+1. Replace the function code with the following:
 
-  ```javascript
-  var uuid = require('uuid').v4;
-  var msRestAzure = require('ms-rest-azure');
-  var eventGrid = require("azure-eventgrid");
-  var url = require('url');
+  ```cs
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.EventGrid;
+using Microsoft.Azure.EventGrid.Models;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
-  module.exports = function (context, req) {
-      context.log('New ice cream order made.');
+namespace ServerlessWorkshop
+{
+    public static class IceCreamOrder
+    {
+        private static readonly string EventGridKey = Environment.GetEnvironmentVariable("EventGridKey");
+        private static readonly string EventGridEndpoint = Environment.GetEnvironmentVariable("EventGridEndpoint");
 
-      if (req.body) {
-          // TODO: Enter value for topicKey
-          let topicKey = '<aeg-sas-key>';
-          // TODO: Enter value for topic-endpoint
-          let topicEndPoint = '<topic-endpoint>';
+        [FunctionName("IceCreamOrder")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            if (!string.IsNullOrWhiteSpace(requestBody))
+            {
+                dynamic data = JsonConvert.DeserializeObject(requestBody);
 
-          let topicCreds = new msRestAzure.TopicCredentials(topicKey);
-          let egClient = new eventGrid(topicCreds);
-          let topicUrl = url.parse(topicEndPoint, true);
-          let topicHostName = topicUrl.host;
-          let currentDate = new Date();
+                var events = new List<EventGridEvent>
+                {
+                    new EventGridEvent
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Subject = "BFYOC/stores/serverlessWorkshop/orders",
+                        DataVersion = "2.0",
+                        EventType = "BFYOC.IceCream.Order",
+                        Data = data,
+                        EventTime = DateTime.UtcNow
+                    }
+                };
 
-          let events = [
-              {
-                  id: uuid(),
-                  subject: 'BFYOC/stores/serverlessWorkshop/orders',
-                  dataVersion: '2.0',
-                  eventType: 'BFYOC.IceCream.Order',
-                  data: req.body,
-                  eventTime: currentDate
-              }
-          ];
-          egClient.publishEvents(topicHostName, events).then((result) => {
-              return Promise.resolve(console.log('Published events successfully.'));
-          }).catch((err) => {
-              console.log('An error ocurred ' + err);
-          });
-      }
-      else {
-          context.res = {
-              status: 400,
-              body: "Please pass an ice cream order in the request body"
-          };
-      }
-      context.done();
-  };
+                var eventGridClient = new EventGridClient(new TopicCredentials(EventGridKey));
+                await eventGridClient.PublishEventsAsync(EventGridEndpoint, events);
+
+                return new OkObjectResult(data);
+            }
+            else
+            {
+                return new BadRequestObjectResult("Please pass an ice cream order in the request body");
+            }
+        }
+    }
+}
+
   ```
-
-  Make sure you update the `<topic-endpoint>` and `<aeg-sas-key>` with that of your topic from the first step.
-
+  Set `EventGridEndpoint` Environment variable/setting to topic host - similar to `dwro01we1rgp.westeurope-1.eventgrid.azure.net`.
+  Set `EventGridKey` Environment variable/setting to topic key. You can copy it from Azure portal.
+  
   What we are doing here is taking the body of the HTTP request and making it the data payload of an Event Grid event. Then all we have to do is add our SAS key as a header value and make an HTTP POST to the topic endpoint with our event as the message body.
 
-1. Update the contents of the `function.json` file in the `IceCreamOrder` folder to the following by deleting the GET method from the input binding:
-
-    ```json
-    {
-      "disabled": false,
-      "bindings": [
-        {
-          "authLevel": "anonymous",
-          "type": "httpTrigger",
-          "direction": "in",
-          "name": "req",
-          "methods": [
-            "post"
-          ]
-        },
-        {
-          "type": "http",
-          "direction": "out",
-          "name": "res"
-        }
-      ]
-    }
-    ```
-
-  We are telling our function it should expect an HTTP POST to trigger it not a GET. We don't want the function to be triggered erroneously.
-
-  Now lets test everything to see it running and makes sure it works.
-
+1. Change your function trigger to support only HTTP POST (not HTTP GET).
 1. If you have not already created an Event Grid Viewer web app, deploy one now by clicking the button below.
 
     <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure-Samples%2Fazure-event-grid-viewer%2Fmaster%2Fazuredeploy.json" target="_blank"><img src="http://azuredeploy.net/deploybutton.png"/></a>
@@ -266,3 +250,4 @@ Two sets of sample files have been provided for you in the supporting-files fold
 * [How to receive events from Event Grid](https://docs.microsoft.com/en-us/azure/event-grid/receive-events)
 * [Available tutorials, quickstarts, and docs on Event Sources](https://docs.microsoft.com/en-us/azure/event-grid/event-sources)
 * [Available tutorials, quickstarts, and docs on Event Handlers](https://docs.microsoft.com/en-us/azure/event-grid/event-handlers)
+* [Handling external events](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-external-events)

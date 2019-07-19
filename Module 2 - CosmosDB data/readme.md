@@ -60,122 +60,78 @@ Which would add a new document to CosmosDB with the corresponding product inform
     * It's not required but I recommend putting this in the same resource group as the function app from module 1.
 1. After the CosmosDB account has been created, open it and copy the "Primary Connection String" from the **Keys** section.  Save this for later.  You may even want to continue on with the next step and come back later to get the key as CosmosDB can take a few minutes to deploy.
 
-    Now onto VS Code
+    Now onto Visual Studio
 
-1. Open your project in VS Code from Module 1.
+1. Open your project in Visual Studio from Module 1.
+1. Install `Microsoft.Azure.WebJobs.Extensions.CosmosDB` Nuget package.
 1. Make the following code changes to the app to no longer expect static data, but to expect dynamic data returned from the CosmosDB *binding* in Azure Functions.
 
-    ```javascript
-    module.exports = async function (context, req, product) {
-        context.log('JavaScript HTTP trigger function processed a request.');
-    
-        if (req.query.id && product) {
-            context.res = {
-                status: 200,
-                body: product
+    ```cs
+    public static class Products
+    {
+        [FunctionName("Products")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
+            [CosmosDB(
+                databaseName: "icecream",
+                collectionName: "products",
+                ConnectionStringSetting = "CosmosDBConnectionString",
+                Id = "{Query.id}")] object product,
+            ILogger log)
+        {
+            if (product != null)
+            {
+                return new OkObjectResult(product);
+            }
+            else
+            {
+                return new BadRequestObjectResult("Please pass in an id query parameter");
             }
         }
-        else {
-            context.res = {
-                status: 400,
-                body: "Please pass in a valid \"id\" query parameter"
-            }
-        }
-    };
+    }
     ```
 
     You'll notice that a few changes were made.  We're no longer passing back a static response, but instead returning a `product`.  That product was added to the method signature as well.  Now we need to configure what `product` should be.  That change is made in the `function.json` file in the same directory.
 
 
-1. Overwrite the `function.json` to the following:
-    ```json
-    {
-      "disabled": false,
-      "bindings": [
-        {
-          "authLevel": "anonymous",
-          "type": "httpTrigger",
-          "direction": "in",
-          "name": "req",
-          "methods": [
-            "get"
-          ]
-        },
-        {
-          "type": "http",
-          "direction": "out",
-          "name": "res"
-        },
-        {
-          "type": "cosmosDB",
-          "name": "product",
-          "databaseName": "icecream",
-          "collectionName": "products",
-          "connectionStringSetting": "CosmosDBConnectionString",
-          "direction": "in",
-          "Id": "{Query.id}"
-        }
-      ]
-    }
+1. Please check function parameters.
+    ```cs
+    [CosmosDB(databaseName: "icecream", ConnectionStringSetting = "CosmosDBConnectionString", Id = "{Query.id}")]   
     ```  
 
-    This is adding a new binding in the function metadata for `CosmosDB`.  You'll see the name of the property we are setting `product`, which corresponds to the function code `product` in the previous step.  In addition we define information on which database and CosmosDB account to connect to.  Specifically we want to connect to the `icecream` database, `products` collection, with the CosmosDB account information from the `CosmosDBConnectionString` setting.  We'll get into that setting later.
+    This attribute is adding a new binding in the function metadata for `CosmosDB`.  You'll see the name of the property we are setting `product`, which corresponds to the function code `product` in the previous step.  In addition we define information on which database and CosmosDB account to connect to.  Specifically we want to connect to the `icecream` database, `products` collection, with the CosmosDB account information from the `CosmosDBConnectionString` setting.  We'll get into that setting later.
 
-    The last chage is the most interesting. You'll see we have an `Id` property in the `function.json`.  This is letting the *input* binding know which document ID to grab.  Azure Functions could also have a SQL query here to query multiple documents, but here we know the ID will be the query parameter `ID`.  Azure Functions provides syntax to grab properties from query or body parameters of triggers. In this case, `{Query.id}` is saying "Get the CosmosDB document in this collection that has the same ID as the `id` query parameter for the HTTP request".  So really the Azure Functions binding framework is doing all of the heavy lifting of exposing CosmosDB through an API.
+    The last chage is the most interesting. You'll see we have an `Id` in the attribute. This is letting the *input* binding know which document ID to grab.  Azure Functions could also have a SQL query here to query multiple documents, but here we know the ID will be the query parameter `ID`.  Azure Functions provides syntax to grab properties from query or body parameters of triggers. In this case, `{Query.id}` is saying "Get the CosmosDB document in this collection that has the same ID as the `id` query parameter for the HTTP request".  So really the Azure Functions binding framework is doing all of the heavy lifting of exposing CosmosDB through an API.
 
     We won't be able to test this function yet, as the CosmosDB account created earlier is totally empty.  So let's add a new function.
 
-1. In the Visual Studio Code extension for Azure Functions, click the lightning bolt icon to add a new function to this app.
-1. Select the current folder to add to the existing app. This function will also be HTTP triggered.
-1. Name it `addProducts` and give it `anonymous` access permissions.
-1. Replace the code in the new `index.js` for `addProducts` with the following:
+1. In the Visual Studio, add a new function to this app.
+1. Name it `AddProducts` and give it `anonymous` access permissions.
+1. Replace the code in the new function for with the following:
 
-    ```javascript
-    module.exports = async function (context, req) {
-        context.log('Add product processed a request.');
-    
-        context.bindings.product = req.body;
-    };
-    ```
-
-    You'll notice we don't need a lot of code here.  In this case we have the same inputs as a regular HTTP function, but in the `context` we are setting the value of a binding `product` to the request body of the HTTP request.  That single line of code is all we need to add a document to CosmosDB!  However we do need to define the metadata so the function runtime knows where to put that document.
-
-1. Replace the contents of the `function.json` file in the `addProducts` folder with the following:
-
-    ```json
+    ```cs
+    public static class AddProducts
     {
-      "disabled": false,
-      "bindings": [
+        [FunctionName("AddProducts")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
+            [CosmosDB(
+                databaseName: "icecream",
+                collectionName: "products",
+                CreateIfNotExists = true,
+                ConnectionStringSetting = "CosmosDbConnectionString")] IAsyncCollector<dynamic> products,
+            ILogger log)
         {
-          "authLevel": "anonymous",
-          "type": "httpTrigger",
-          "direction": "in",
-          "name": "req",
-          "methods": [
-            "post"
-          ]
-        },
-        {
-          "type": "http",
-          "direction": "out",
-          "name": "res"
-        },
-        {
-          "name": "product",
-          "type": "cosmosDB",
-          "databaseName": "icecream",
-          "collectionName": "products",
-          "createIfNotExists": true,
-          "connectionStringSetting": "CosmosDbConnectionString",
-          "direction": "out"
-      }
-      ]
+            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic product = JsonConvert.DeserializeObject(requestBody);
+            await products.AddAsync(product);
+
+            return new OkResult();
+        }
     }
     ```
 
-    This is very similar to the input binding from before, with a few changes.  We still will call the binding `product` (as referenced in the code).  However the `direction` in this case is `out` meaning it will *write* to CosmosDB instead of reading.  We also are setting `createIfNotExists` to `true`, which means if this collection and database doesn't already exist in the CosmosDB account, it will create one for us.
-
-    The last part is we need to associate the CosmosDB we created in the first few steps with these functions.  You may have noticed we've referenced `CosmosDbConnectionString` a few times.  Those connection string settings and environment variables are stored in `local.settings.json`
+    You'll notice we don't need a lot of code here.  In this case we have the same inputs as a regular HTTP function, but in the `context` we are setting the value of a binding `product` to the request body of the HTTP request.  That single line of code is all we need to add a document to CosmosDB!  However we do need to define the metadata so the function runtime knows where to put that document.
 
 1. Open the `local.settings.json` file at the root of the project.  It should look like this:
 
@@ -184,7 +140,7 @@ Which would add a new document to CosmosDB with the corresponding product inform
       "IsEncrypted": false,
       "Values": {
         "AzureWebJobsStorage": "",
-        "FUNCTIONS_WORKER_RUNTIME": "node"
+        "FUNCTIONS_WORKER_RUNTIME": "dotnet"
       }
     }
     ```
@@ -199,9 +155,8 @@ Which would add a new document to CosmosDB with the corresponding product inform
     {
         "IsEncrypted": false,
         "Values": {
-          "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=amazing-lab;AccountKey=ShhhThisIsASecret;EndpointSuffix=core.windows.net",
           "CosmosDbConnectionString": "AccountEndpoint=https://awesome-function-lab.documents.azure.com:443/;AccountKey=Thisisasecret;",
-          "FUNCTIONS_WORKER_RUNTIME": "node"
+          "FUNCTIONS_WORKER_RUNTIME": "dotnet"
         }
       }
       
@@ -261,7 +216,7 @@ Which would add a new document to CosmosDB with the corresponding product inform
 
     Now that the app is working and backed by CosmosDB, we need to publish this update.
 
-1. Open the Azure Functions extension in VS Code and click the up-arrow icon to publish
+1. Open the Azure Functions in Visual Studio and click the up-arrow icon to publish
 1. Choose the current folder, and select the function app created in step 1
     1. You should see a notification that the app is updating
 1. There is one last step.  We need to update the application settings in your published app to have the changes we made to local settings.  In the VS Code Azure Functions extension, find your function app, open it, right-click the "Application Settings" and choose **Upload local settings..**.  This will push your local settings up to your published app.

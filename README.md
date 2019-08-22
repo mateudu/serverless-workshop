@@ -9,3 +9,10 @@ Because premium ingredients is key to their success, their profit margins are re
 BFYOC would like to launch a new customer feedback tool to analyze their sales and customer satisfaction levels. Because feedback posts from customers will be sporadic, they are looking for options that can automatically scale, and minimize investment in infrastructure.
 
 In addition, they would like to streamline their inventory and ordering process to reduce costs and product waste. They want to be able to notify distributors of new ice creams, and automate the processing of new orders based on inventory.
+
+## Links
+[Serverless Services Introduction – Enterprise-Scale Process In One Day](https://predica.pl/blog/serverless-services-introduction/)
+
+[Azure Key Vault from Dev and Ops Perspective](https://predica.pl/blog/azure-key-vault/)
+
+[Monitor Your Azure Subscription With Azure Event Grid And Power BI](https://predica.pl/blog/azure-event-grid/)

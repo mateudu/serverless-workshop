@@ -131,7 +131,8 @@ namespace ServerlessWorkshop
   What we are doing here is taking the body of the HTTP request and making it the data payload of an Event Grid event. Then all we have to do is add our SAS key as a header value and make an HTTP POST to the topic endpoint with our event as the message body.
 
 1. Change your function trigger to support only HTTP POST (not HTTP GET).
-1. If you have not already created an Event Grid Viewer web app, deploy one now by clicking the button below.
+1. If you have not already created an Event Grid Viewer web app, deploy one now by clicking the button below. 
+**Make sure to use different Web App name than the Function App name (the one that you used at the beginning of the workshop)!**
 
     <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure-Samples%2Fazure-event-grid-viewer%2Fmaster%2Fazuredeploy.json" target="_blank"><img src="http://azuredeploy.net/deploybutton.png"/></a>
 
